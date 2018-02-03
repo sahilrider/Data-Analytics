@@ -1,0 +1,100 @@
+---
+title: "Dean's Dilemma"
+author: "Sahil kumar"
+date: "February 3, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(psych)
+library(lattice)
+library(car)
+```
+
+
+# Reading File
+```{r}
+setwd("G:\\Intern - IIM Lucknow")
+df <- read.csv("Data - Deans Dilemma.csv")
+View(df)
+```
+
+# Describing Dataset
+```{r}
+describe(df)
+```
+
+# Use R to calculate the median salary of all the students in the data sample
+```{r}
+median(df$Salary)
+```
+
+# Use R to calculate the percentage of students who were placed, correct to 2 decimal places.
+```{r}
+options(digits=4)
+mytable=prop.table(table(df$Placement))*100
+mytable[2]
+```
+
+# Use R to create a dataframe called placed, that contains a subset of only those students who were successfully placed.
+```{r}
+placed=df[which(df$Placement=='Placed'),]
+View(placed)
+```
+
+# Use R to find the  median salary of students who were placed.
+```{r}
+median(placed$Salary)
+```
+
+# Use R to create a table showing the mean salary of males and females, who were placed. 
+```{r}
+mytable <- aggregate(Salary~Gender ,data=placed,mean)
+mytable
+```
+
+# Use R to generate a histogram showing breakup of the MBA performance of the students who were placed
+```{r}
+hist(placed$Percent_MBA ,main="MBA Performance of placed students",
+          xlab="MBA Percentage",ylab="Count",
+          xlim=c(50,80),ylim=c(0,150),breaks=3,col="grey")
+```
+
+# Create a dataframe called notplaced, that contains a subset of only those students who were NOT placed after their MBA.
+```{r}
+not_placed=df[which(df$Placement=='Not Placed'),]
+View(not_placed)
+```
+
+# Draw two histograms side-by-side, visually comparing the MBA performance of Placed and Not Placed students
+```{r}
+par(mfrow=c(1,2))
+
+hist(placed$Percent_MBA ,main="MBA Performance of placed students",
+          xlab="MBA Percentage",ylab="Count",
+          xlim=c(50,80),ylim=c(0,150),breaks=3,col="grey")
+
+hist(not_placed$Percent_MBA ,main="MBA Performance ofnot placed students",
+          xlab="MBA Percentage",ylab="Count",
+          xlim=c(50,80),ylim=c(0,50),breaks=3,col="grey")
+
+```
+
+# Use R to draw two boxplots, one below the other, comparing the distribution of salaries of males and females who were placed
+```{r}
+bwplot(placed$Gender~placed$Salary ,data=placed,xlab="Salary",ylab="Gender",main = "Comparison of Salaries of Males and Females")
+```
+
+# Create a dataframe called placedET, representing students who were placed after the MBA and who also gave some MBA entrance test before admission into the MBA program. 
+```{r}
+placedET <- placed[which(placed$S.TEST==1),]
+View(placedET)
+```
+# Draw a Scatter Plot Matrix for 3 variables -- {Salary, Percent_MBA, Percentile_ET} using the dataframe placedET.
+```{r}
+scatterplotMatrix(formula= ~Salary+Percent_MBA+Percentile_ET ,data=placedET)
+```
+

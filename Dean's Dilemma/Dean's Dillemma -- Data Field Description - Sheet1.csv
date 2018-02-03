@@ -1,0 +1,26 @@
+S.No.,Variable,Data Type,Meaning
+1,Gender,Nominal,"Sex {M, F}"
+2,Gender-B,Nominal,"Sex {0, 1}"
+3,Percent_SSC,Continuous,Percentage scored in SSC / 10th Standard
+4,Board_SSC,Ordinal,"Board {CBSE, ICSE, Others}"
+5,Board_CBSE,Ordinal,"Board {1, 0, 0}"
+6,Board_ICSE,Ordinal,"Board {1, 0, 0}"
+7,Percent_HSC,Continuous,Percentage (Marks) obtained in 12th Standard/Higher Secondary Certificate
+8,Board_HSC,Ordinal,Examination Board/Boards of Education for 12th Standard
+9,Stream_HSC,Ordinal,"Stream of Education: Commerce, Sciences, Arts"
+10,Percent_Degree,Continuous,Percentage (Marks) Obtained in Bachelor's Degree
+11,Course_Degree,Ordinal,Type of degree chosen for graduation
+12,Degree_Engg,Nominal,"Engineering {1, 0}"
+13,Experience_Yrs,Ordinal,Number of years of prior work experience
+14,Entrance_Test,Ordinal,Type of entrance test appear in
+15,S-TEST,Nominal,"Appear in entarnce test {1, 0}"
+16,Percentile_ET,Continuous,Percentile obtained in entrance test
+17,S-TEST*SCORE,Continuous,Product of percentile obtained in entrance test and student appeared in entrance test
+18,Percent_MBA,Continuous,Percentage obtained after completion of MBA
+19,Specialization_MBA,Ordinal,Subject specialization in during MBA
+20,Marks_Communication,Continuous,Marks obtained in communication
+21,Marks_Projectwork,Continuous,Marks obtained in project work
+22,Marks_BOCA,Continuous,Marks obtained in business oriented computer applications
+23,Placement,Nominal,Was the student placed via campus recruitment?
+24,Placement_B,Nominal,"Whether the student palced or not {1, 0}"
+25,Salary,Continuous,Salary offered to the student
