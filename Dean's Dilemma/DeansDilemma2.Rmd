@@ -1,0 +1,43 @@
+---
+title: "Dean's Dilemma (Part-II)"
+author: "Sahil kumar"
+date: "February 5, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Reading file
+```{r}
+df <- read.csv("Data - Deans Dilemma.csv")
+View(df)
+```
+# Dataframe for placed
+```{r}
+placed <- df[which(df$Placement=="Placed"),]
+View(placed)
+```
+
+
+# R code that creates a table showing the mean salary of males and females, who were placed.
+```{r}
+mytable <- aggregate(placed$Salary ,by=list(placed$Gender),mean)
+mytable
+```
+Average Salary of males are higher than the females.
+
+Average salary of male = 284241.9
+Average salary of female = 253068.0
+
+#Use R to run a t-test to test the following hypothesis:
+  H1: The average salary of the male MBAs is higher than the average salary of female MBAs.
+```{r}
+t.test(Salary~Gender ,data=placed)
+```
+
+p-value is 0.00234
+
+As p-value < 0.05 . So ,Null hypothesis is rejected that difference in mean salary of M & F is 0.
+Thus, The average salary of the male MBAs is higher than the average salary of female MBAs.

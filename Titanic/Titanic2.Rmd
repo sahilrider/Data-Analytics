@@ -1,0 +1,31 @@
+---
+title: "Titanic (Part - II)"
+author: "Sahil kumar"
+date: "February 5, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Reading Dataset
+```{r}
+titanic <- read.csv("Titanic Data.csv")
+View(titanic)
+```
+
+# Use R to create a table showing the average age of the survivors and the average age of the people who died.
+```{r}
+mytable <- aggregate(titanic$Age , by=list(titanic$Survived) ,mean)
+mytable
+```
+
+# Use R to run a t-test to test the following hypothesis:
+  H2: The Titanic survivors were younger than the passengers who died.
+```{r}
+t.test(Age ~ Survived ,data=titanic)
+```
+
+# Conclusion
+Since, the p-value is < 0.05, we can reject the null hypothesis. And conclude that,"The Titanic survivors were younger than the passengers who died".
