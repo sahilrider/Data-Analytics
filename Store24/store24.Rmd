@@ -1,0 +1,169 @@
+---
+title: 'Store24 (A): Managing Employee Retention'
+author: "Sahil kumar"
+date: "February 12, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Task 4c Loading and Summary of Dataset
+```{r}
+setwd("G:\\Intern - IIM Lucknow")
+store <-read.csv(paste("Store24.csv",sep=""))
+View(store)
+
+summary(store)
+```
+
+#Task 4d
+#1.Use R to measure the mean and standard deviation of Profit.
+```{r}
+mean(store$Profit)
+sd(store$Profit)
+```
+
+#2.Use R to measure the mean and standard deviation of MTenure.
+```{r}
+mean(store$MTenure)
+sd(store$MTenure)
+```
+
+#3.Use R to measure the mean and standard deviation of CTenure.
+```{r}
+mean(store$CTenure)
+sd(store$CTenure)
+```
+
+#Task 4e Sorting and Subsetting data in R
+```{r}
+attach(mtcars)
+View(mtcars)
+newdata <- mtcars[order(mpg),] # sort by mpg (ascending)
+View(newdata)
+newdata[1:5,] # see the first 5 rows
+```
+```{r}
+newdata <- mtcars[order(-mpg),] # sort by mpg (descending)
+View(newdata)
+newdata[1:5,] # see the first 5 rows
+detach(mtcars)
+```
+
+#Task 4f
+#4.Use R to print the {StoreID, Sales, Profit, MTenure, CTenure} of the top 10 most profitable stores.
+```{r}
+attach(store)
+newdata<-store[order(-Profit),]
+View(newdata)
+newdata[1:10,1:5]
+```
+#5.Use R to print the {StoreID, Sales, Profit, MTenure, CTenure} of the bottom 10 least profitable stores.
+```{r}
+newdata[66:75,1:5]
+```
+
+#Task 4g  Scatter Plots
+```{r}
+library(car)
+```
+#6.Use R to draw a scatter plot of Profit vs. MTenure.
+```{r}
+scatterplot(Profit~MTenure,data=store,xlab="MTenure",
+            ylab="Profit",main="Scatterplot of MTenure vs. Profit")
+```
+
+#Task 4h
+#7.Use R to draw a scatter plot of Profit vs. CTenure.
+```{r}
+scatterplot(Profit~CTenure,data=store,xlab="CTenure",
+            ylab="Profit",main="Scatterplot of CTenure vs. Profit")
+```
+
+#Task 4i Correlation Matrix
+#8.Use R to construct a Correlation Matrix for all the variables in the dataset.
+```{r}
+options(digits=2)
+cor(store)
+```
+
+#Task 4jCorrelations
+#9.Use R to measure the correlation between Profit and MTenure. 
+```{r}
+cor(store$Profit,store$MTenure)
+```
+
+#10.Use R to measure the correlation between Profit and CTenure. 
+```{r}
+cor(store$Profit,store$CTenure)
+```
+
+#Task 4k
+```{r}
+library(corrgram)
+```
+#11.Use R to construct the following Corrgram based on all variables in the dataset.
+```{r}
+corrgram(store,lower.panel=panel.shade,
+         upper.panel=panel.pie,main="Corrgram of Store24 dataset")
+```
+
+#Task 4i Pearson's Correlation Tests
+
+#12.Run a Pearson's Correlation test on the correlation between Profit and MTenure. What is the p-value?
+```{r}
+cor.test(store$Profit,store$MTenure,method="pearson")
+```
+P-value is 8e-05
+
+#13.Run a Pearson's Correlation test on the correlation between Profit and CTenure. What is the p-value?
+```{r}
+cor.test(store$Profit,store$CTenure,method="pearson")
+```
+P-value is 0.03
+
+#Task 4m Regression Analysis
+#14.Run a regression of Profit on {MTenure, CTenure Comp, Pop, PedCount, Res, Hours24, Visibility}.
+
+```{r}
+regr<- lm(Profit~MTenure+CTenure+Comp+Pop+PedCount+Res+Hours24+Visibility, data=store)
+summary(regr)
+```
+
+#Task 4n
+
+#15.List the explanatory variable(s) whose beta-coefficients are statistically significant (p < 0.05).
+
+MTenure, CTenure, Comp, Pop, PedCount, Res, Hours24
+
+#16.List the explanatory variable(s) whose beta-coefficients are not statistically significant (p > 0.05).
+
+Visibility
+
+#Task 4o
+
+#17.What is expected change in the Profit at a store, if the Manager's tenure i.e. number of months of experience with Store24, increases by one month?
+
+From the above analysis, we can decipher that if the Manager's tenure is increased by a month, the profit changes by $760.99.
+
+#18.What is expected change in the Profit at a store, if the Crew's tenure i.e. number of months of experience with Store24, increases by one month?
+
+From the above analysis, we can decipher that if the Crew's tenure is increased by a month, the profit changes by $944.98.
+
+#Task 4p Executive Summary
+
+In the case study , we read that there were discussion about the relation between Profit and tenures of Managers and Crews.
+Apart from various other factors as surroundings , population and competition , Managers and crew plays an important role in optimizing the profit of the store.
+We carried out different analysis that how profit depends on Tenure of Managers and crew.
+
+* The most profitable store is with ID:74 and the least profitable store is :57
+* Looking at the correlation stats, we can deduce that profit has more correlation with the management tenure         (0.44).So, definitely we can say that the financial Performance of the   Store24 (A) is affected by the managerial   tenure.
+* With pearson corr value of 0.26 Crew Tenure also plays an important role.
+* p-value is less than 0.5 which concludes that this hypothesis is True.
+* The regression coefficient suggests that the value of p is significiant which says it is a good fit model.
+* R square value is:0.6379.It means that 63.79% of variations in the dependent variable can be explained by the independent variable.
+* Adjusted R square value is 0.594.It means 59.4% variation in the dependent variable can be explained by the         independent variable also the value decreases as we add no of independent variables to it.
+* Explanatory variable(s) whose beta-coefficients are statistically significant are - MTenure , CTenure, Pop ,        PedCount , Res , Hours24 while that whose beta-coefficients are not statistically significant is the Visibility     variable.
+
+# Overall we can say that it is a good regression model.
