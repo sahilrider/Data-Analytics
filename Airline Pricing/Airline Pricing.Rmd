@@ -1,0 +1,166 @@
+---
+title: "Airline Pricing"
+author: "Sahil kumar"
+date: "February 16, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Reading the dataset
+```{r}
+airline<-read.csv(paste("SixAirlinesDataV2.csv",sep=""))
+View(airline)
+```
+
+#Summary
+```{r}
+library(psych)
+describe(airline)
+```
+
+```{r}
+str(airline)
+```
+
+#Mean
+```{r}
+apply(airline[,6:18], MARGIN =2, FUN=mean)
+```
+
+#Median
+```{r}
+apply(airline[,6:18], MARGIN =2, FUN=median)
+```
+
+#Standard Deviation
+```{r}
+apply(airline[,6:18], MARGIN =2, FUN=sd)
+```
+
+#Visualisation
+
+```{r}
+#Airline Speifications
+
+par(mfcol=c(1,2))
+pie(table(airline[,"Airline"]),col=c("blue","Red","green","pink","yellow","black"),main="Airline Distribution")
+pie(table(airline[,"Aircraft"]),col=c("red","blue"),main="Aircraft Manufacturer")
+```
+
+```{r}
+par(mfrow=c(1,2))
+hist(airline[,"FlightDuration"], xlab = "Flight Duration(hrs)", ylab = "Frequency", main="Flight duration histogram", col=c("red", "green","yellow"), xlim = c(0,16), ylim = c(0, 60))
+
+boxplot(airline[,"FlightDuration"], xlab = "Flight Duration(hrs)", ylab = "Frequency", main = "Flight Duration boxplot")
+
+```
+
+```{r}
+par(mfrow=c(1,2))
+hist(airline[,"SeatsEconomy"], xlab = "Number of Economy seats", ylab = "Frequency", main="seat economy histogram", col=c("red", "green"), xlim = c(0,500), ylim = c(0, 200))
+
+boxplot(airline[,"SeatsEconomy"], xlab = "Number of Economy seats", ylab = "Frequency", main = "Seat econnomy boxplot")
+```
+
+```{r}
+par(mfrow=c(1,2))
+hist(airline[,"SeatsPremium"], xlab = "Number of Premium seats", ylab = "Frequency", main="seat premium histogram", col=c("red", "green"), xlim = c(0,70), ylim = c(0, 200))
+
+boxplot(airline[,"SeatsPremium"], xlab = "Number of Premium seats", ylab = "Frequency", main = "Seat premium boxplot")
+
+```
+
+```{r}
+pie(table(airline[,"TravelMonth"]),col=c("blue", "green", "red", "yellow", "orange", "purple"), main="Common Travel Month")
+```
+
+#Economy Seats
+```{r}
+library(car)
+
+scatterplot(airline$SeatsEconomy, airline$PriceEconomy, main="Price of Economy seats vs. no of Economy seats ", xlab = "seats", ylab = "price")
+```
+
+#Premium Economy
+```{r}
+scatterplot(airline$SeatsPremium, airline$PricePremium, main="Price of Economy seats vs. no of Economy seats ", xlab = "seats", ylab = "price")
+```
+
+```{r}
+library(lattice)
+histogram(~PriceEconomy | IsInternational, data=airline, col="blue", main = "Price of economy class tickets in international and domestic flights")
+```
+
+```{r}
+boxplot(airline$PriceEconomy~airline$IsInternational, ylab= "Price Economy", xlab="Flight type", col=c("blue","red"), main="Price of economy class tickits in interantional and domestics flights")
+```
+
+#Price wrt Flight Duration
+```{r}
+par(mfrow=c(2,1))
+scatterplot(airline$PricePremium,airline$FlightDuration,main="premium class pricing with flight duration")
+scatterplot(airline$PriceEconomy,airline$FlightDuration,main="economy class pricing with flight duration")
+```
+
+#Pitch Difference
+```{r}
+barchart(PitchDifference ~ Airline, data=airline, groups=IsInternational, auto.key=TRUE, par.settings = simpleTheme(col=c("white", "black")), main="ptich difference in each airline with terminal", xlab="airlines")
+```
+
+#Width Difference
+```{r}
+barchart(WidthDifference ~ Airline, data=airline, groups=IsInternational, auto.key=TRUE, par.settings = simpleTheme(col=c("white", "black")), main="Width difference in each airline with terminal", xlab="airlines")
+```
+
+#Corrgram
+```{r}
+library(corrgram)
+corrgram(airline,order=TRUE,lower.panel=panel.shade,upper.panel = panel.pie,main="Corrgram")
+```
+
+#T-Test
+Null Hypothesis : There is no difference between price of Economy and Premium Economy class
+
+Alternate Hypothesis : Price of premium economy class is higher than the price of economy class
+```{r}
+t.test(airline$PriceEconomy,airline$PricePremium)
+```
+
+As p-value<0.05 , so null hypothesis is rejected .
+
+#Pearson's Correlation Test
+
+1. Between difference in price vs width difference
+```{r}
+cor.test((airline$PricePremium-airline$PriceEconomy),airline$WidthDifference)
+```
+
+2. Between difference in price vs pitch difference
+```{r}
+cor.test((airline$PricePremium-airline$PriceEconomy),airline$PitchDifference)
+```
+p-value >0.05 . Not significant
+
+3.Between difference in price vs fight duration
+```{r}
+cor.test((airline$PricePremium-airline$PriceEconomy),airline$FlightDuration)
+```
+
+#Regression Analysis
+```{r}
+fit <- lm((airline$PricePremium-airline$PriceEconomy)~airline$PitchDifference+airline$WidthDifference+airline$FlightDuration)
+
+summary(fit)
+```
+```{r}
+fit$coefficients
+```
+
+From the regression analysis , we can conclude that
+* Flight Duration plays an important part in deciding the price difference
+* Widht Difference is also important.
+* In case of pitch difference , p-value = 0.6174>0.05 , thus it is not significant.
+
+Overall , p-value <0.05 for the model , so we can say that it is a good model.
