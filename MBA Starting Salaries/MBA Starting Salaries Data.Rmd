@@ -1,0 +1,206 @@
+---
+title: "MBA Starting Salaries"
+author: "Sahil kumar"
+date: "February 20, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Reading Dataset
+```{r}
+mba <- read.csv(paste("MBA Starting Salaries Data.csv",sep=""))
+View(mba)
+```
+
+#Describing Dataset
+```{r}
+library(psych)
+describe(mba)
+```
+
+#Visualization Plots
+```{r}
+mba$sex=factor(mba$sex, levels=c(1,2), labels=c("Male","Female"))
+plot(mba$sex,col = "red",main = "Gender distribution in MBA Schools")
+```
+
+```{r}
+hist(mba$gmat_tot, xlab="GMAT total score",main="GMAT scores of Students", breaks=15,col="blue")
+```
+
+```{r}
+hist(mba$work_yrs,col="red",xlab="years of work experience",main = "Work Experience",breaks = 10)
+```
+
+```{r}
+boxplot(mba$salary, main="Salary Details",
+              col=c("red"),horizontal=TRUE,
+              xlab="Salary" )
+```
+
+```{r}
+fl= factor(mba$frstlang, levels=c(1,2), labels=c("English","Others"))
+    plot(fl,col="yellow",main = "Language Distribution")
+```
+
+```{r}
+f1<- mba[ which(mba$satis<='7'), ]
+hist(f1$satis,breaks =5,col="green",xlab="Degree of Satisfaction (1=low,7=high)", main="Satisfaction  distribution of MBA students")
+```
+
+#Creating Subset for those who got a job
+```{r}
+jobmba<-subset(mba,salary!=0)
+jobmba1<-subset(jobmba,salary!=999)
+jobf<-subset(jobmba1,salary!=998)
+
+summary(jobf)[,c(1:5,12)]
+```
+
+
+#Comparison of salary wrt different features
+```{r}
+library(car)    
+scatterplot(salary ~ age,data=jobf,
+            main="Scatter plot of salary vs age",
+            xlab="age",
+            ylab="salary")
+```
+
+```{r}
+scatterplot(salary ~gmat_tot,data=jobf,
+            spread=FALSE, smoother.args=list(lty=2),
+            main="Scatter plot of salary vs Gmat total",
+            xlab="Gmat score",
+            ylab="salary")
+```
+
+```{r}
+library(lattice)
+
+mba$frstlang=factor(mba$frstlang,levels=c(1,2),labels=c("English","Others"))
+bwplot(frstlang ~salary,data=jobf,horizontal="TRUE",ylab="language spoken (1=english,2=rest)")
+```
+
+```{r}
+bwplot(sex ~ salary, data=mba, horizontal=TRUE, 
+       xlab = "Salary")
+```
+
+```{r}
+bwplot(satis~salary,jobf,xlab="Salary")
+```
+
+```{r}
+bwplot(work_yrs~salary,jobf)
+```
+
+#Comparing Factors
+```{r}
+bwplot(work_yrs ~ salary | sex, data=mba, 
+       horizontal=TRUE, xlab="Income")
+```
+```{r}
+bwplot(quarter ~ salary | sex, data=mba, 
+       horizontal=TRUE, xlab="Income")
+
+```
+
+#Corrgram Visualization
+```{r}
+library(corrgram)
+corrgram(mba,lower.panel=panel.shade,
+         upper.panel=panel.pie, text.panel=panel.txt,
+         main="Corrgram of salary intercorrelations")
+```
+
+#Correlation Matrix
+```{r}
+x <- jobf[,c("age", "gmat_tot", "gmat_qpc", "gmat_vpc","gmat_tpc","s_avg","f_avg","work_yrs","salary")]
+cor(x,x)
+```
+
+#Few contigency tables 
+
+#1. Sex vs Salary
+```{r}
+mytable<-xtabs(~salary+sex,jobf)
+   mytable
+```
+
+#Chi Square Test
+```{r}
+chisq.test(mytable)
+```
+
+#t-Test
+```{r}
+t.test(salary ~ sex, data=jobf)
+```
+
+Inference:
+Men are paid more than Females.
+
+#2. Effect of First Language on Salary
+```{r}
+ mytable1<-xtabs(~salary+frstlang,jobf)
+   mytable1
+```
+
+```{r}
+chisq.test(mytable1)
+```
+
+```{r}
+ t.test(salary ~ frstlang, data=jobf)
+```
+
+#3. Effect of Work Years on Salary
+```{r}
+mytable2<-xtabs(~salary+work_yrs,jobf)
+   mytable2
+```
+
+```{r}
+chisq.test(mytable2)
+```
+Thus There is a relation between Work experience and Placement Salaries;2 years is optimal.
+
+#Regression Analysis
+
+#Analysis 1
+```{r}
+m1<-lm(salary~quarter+s_avg+f_avg+age,jobf)
+summary(m1)
+```
+
+Age is only significant variable here.
+
+#Analysis 2
+```{r}
+m2<-lm(salary~gmat_tot+gmat_tpc+gmat_vpc+gmat_qpc,jobf)
+summary(m2)
+```
+gmat_tpc is a significant variable.
+
+#Analysis 3
+```{r}
+m3<-lm(salary~sex+frstlang+satis+work_yrs+quarter,jobf)
+summary(m3)
+```
+Work years and FirstLang are important variables.
+
+# People who didn't got any job
+```{r}
+nojob<-subset(mba,salary==0)
+
+summary(nojob)
+```
+```{r}
+hist(nojob$satis, xlab="Satisfaction",main="MBA Satisfaction", breaks=7,col="blue")
+```
+
+
