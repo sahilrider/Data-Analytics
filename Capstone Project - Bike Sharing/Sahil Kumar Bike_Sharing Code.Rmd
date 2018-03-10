@@ -1,0 +1,214 @@
+---
+title: "Bike Sharing"
+author: "Sahil kumar"
+date: "February 18, 2018"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+<b>
+Title   : Analysis of Bike Sharing Dataset<br>
+Name    : Sahil kumar<br>
+Email   : sahilriders@gmail.com<br>
+College : Institute of Engineering and Management , Kolkata<br>
+</b>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Setting Working Directory
+```{r}
+setwd("G:/Intern - IIM Lucknow/Bike-Sharing-Dataset")
+```
+#Loading necessary packages
+```{r}
+library(psych)
+library(car)
+library(corrgram)
+library(ggplot2)
+library("lattice", lib.loc="C:/Program Files/R/R-3.4.3/library")
+```
+
+#Reading Dataset
+```{r}
+df <- read.csv(paste("hour.csv",sep=""))
+View(df)
+```
+
+#Describing Dataset
+```{r}
+describe(df)
+```
+
+```{r}
+str(df)
+```
+
+*There are two types of customers :-
+ 1. Casual
+ 2. Registered
+ 
+*Last 3 columns represents bike sharing among casual, registered and both customers.
+
+# EDA
+
+# Season vs Bike Shared
+<b>TABLE</b>
+```{r}
+attach(df)
+aggregate(cbind(casual,registered,cnt)~season,data=df,mean)
+```
+
+<b>BOXPLOTS</b>
+```{r}
+par(mfrow=c(3,1))
+bwplot(season~casual ,data=df,xlab = "Total count of bike sharing",main='Casual Customers')
+bwplot(season~registered ,data=df,xlab = "Total count of bike sharing",main='Registered Customers')
+bwplot(season~cnt ,data=df,xlab = "Total count of bike sharing",main='All customers')
+```
+
+<b>Inference :</b>
+<ol>
+<li> Maximum bike sharing is done in Season 3.</li>
+<li>2. Bike shared among registered users is more than casual users.</li>
+</ol>
+
+# Month vs Bike shared
+
+<b>TABLE</b>
+```{r}
+aggregate(cbind(casual,registered,cnt)~mnth,data=df,mean)
+```
+
+<b>BOXPLOTS</b>
+```{r}
+par(mfrow=c(3,1))
+plot(aggregate(casual~mnth ,data=df,mean),xlab='Month',ylab='Count of Bike shared',main='casual users')
+plot(aggregate(registered~mnth ,data=df,mean),xlab='Month',ylab='Count of Bike shared',main='registered users')
+plot(aggregate(cnt~mnth ,data=df,mean),xlab='Month',ylab='Count of Bike shared',main='all users')
+```
+
+<b>Inference:-</b><br>
+On an Average , most bike sharing happens between March to November month.
+<br>
+<b>Hypothesis:-</b><br>
+Reason of low bike sharing in other months can be LOW TEMPERATURE.
+
+# Hour vs Bike shared
+
+<b>TABLE</b>
+```{r}
+aggregate(cbind(casual,registered,cnt)~hr,data=df,mean)
+```
+
+<b>BOXPLOTS</b>
+```{r}
+par(mfrow=c(3,1))
+plot(aggregate(casual~hr ,data=df,mean),xlab='Hour of the day',ylab='Count of Bike shared',main='casual users')
+plot(aggregate(registered~hr ,data=df,mean),xlab='Hour of the day',ylab='Count of Bike shared',main='registered users')
+plot(aggregate(cnt~hr ,data=df,mean),xlab='Hour of the day',ylab='Count of Bike shared',main='all users')
+```
+
+<b>Inference :-</b><br>
+1. For casual customers , bike sharing starts around 7am ,reaches its peak around 2pm then further decreases.<br>
+2. In General , bike sharing reaches its peak around 8 am ,declines and again rises to reach its peak around 5pm.<br>
+
+<b>Hypothesis:</b><br>
+Bike sharing is more in morning and evening.<br>
+Not in afternoon , maybe due to excess heat.<br>
+
+# EFFECT OF HOLIDAYS ON BIKE SHARING
+
+<b>TABLE</b>
+```{r}
+mytable<-aggregate(cbind(casual,registered,cnt)~holiday ,data=df,mean)
+mytable
+
+```
+
+<b>BARCHARTS</b>
+```{r}
+par(mfrow=c(1,3))
+barchart(casual~holiday,data=mytable,horizontal=FALSE,ylim=c(0,50))
+barchart(registered~holiday,data=mytable,horizontal=FALSE,ylim=c(0,200))
+barchart(cnt~holiday,data=mytable,horizontal=FALSE,ylim=c(0,200))
+```
+
+# EFFECT OF WEATHER SITUATION ON TOTAL BIKE SHARING
+
+<b>TABLE</b>
+```{r}
+wsittable<-aggregate(cnt~weathersit ,data=df,mean)
+wsittable
+```
+
+<b>BOXPLOTS</b>
+```{r}
+bwplot(weathersit~cnt,data=df,xlab ="No of total bike shared",ylab="Different weather situation",main="")
+```
+Weather Situtation 1 is highly suitable for bike sharing.
+
+# Scatterplot of temp vs total bike sharing
+```{r}
+histogram(df$temp)
+scatterplot(cnt~temp,data=df)
+```
+
+#Humidity
+```{r}
+histogram(df$hum)
+scatterplot(cnt~hum,data=df)
+```
+
+#Windspeed
+```{r}
+histogram(df$windspeed)
+scatterplot(cnt~windspeed,data=df)
+```
+
+#Correlation Analysis
+
+```{r}
+corrgram(df,lower.panel=panel.shade,
+         upper.panel=panel.pie, text.panel=panel.txt,
+         main="Corrgram")
+```
+
+```{r}
+df_subset <- df[,10:17]
+
+
+df_cor <- cor(df_subset)
+library(corrplot)
+corrplot(df_cor, method = 'color', addCoef.col="black")
+```
+
+#T-TEST
+```{r}
+t.test(cnt~holiday,data=df)
+```
+
+<b>It means that there is significance difference in bike sharing if the day is holiday or not</b>
+
+#Regression Analysis
+
+We are going to fit 'cnt' which is count of bike shared wrt to the factors: weathersit,temp,atemp,hum,windspeed,casual,registered.
+<br>
+In order to test this hypothesis, we are proposing this model:
+<br>
+y=b0 + b1\*weathersit + b2\*temp + b3\*atemp + b4\*hum + b5\*windspeed + b6\*casual + b7\*registered
+
+```{r}
+mod1 <-lm(cnt~weathersit+temp+atemp+hum+windspeed+casual+registered,df)
+summary(mod1)
+```
+
+**Inference :**
+We can see that the Residual standard error is very low which means that overall the model is a good fit.<br>
+p-value corresponding to each variable is also less than 0.5 which means that they are significant for the model. <br>
+Most significant variables are Weathersit, temp, windspeed, casual and registered. <br>
+F-statistic is also very high which means tht our hypothesis is compatible with the observed data. <br>
+
